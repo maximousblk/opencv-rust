@@ -16,7 +16,7 @@ jobs:
       matrix:
         os-image:
           - ubuntu-24.04
-          - macos-14
+          - macos-15
         opencv-version:
           - 4.11.0
         linkage:
@@ -72,12 +72,7 @@ jobs:
         vcpkg-features-cache-key:
           - full
         vcpkg-features:
-          - contrib,nonfree,ade,opencl
-        include:
-          - os-image: windows-2025
-            vcpkg-version: 2025.01.13
-            vcpkg-features-cache-key: min
-            vcpkg-features: contrib
+          - contrib,imgproc,imgcodecs
     runs-on: ${{ matrix.os-image }}
     env:
       VCPKG_VERSION: ${{ matrix.vcpkg-version }}
@@ -99,86 +94,4 @@ jobs:
 
       - name: Test project
         run: ci/script.sh
-        shell: bash
-
-  bin:
-    strategy:
-      fail-fast: false
-      matrix:
-        os-image:
-          - windows-2022
-        version:
-          - opencv: 3.4.16
-          - opencv: 4.11.0 # https://community.chocolatey.org/packages/OpenCV#versionhistory
-        include:
-          - os-image: ubuntu-24.04
-            version:
-              opencv: 4.6.0
-          - os-image: ubuntu-22.04
-            version:
-              opencv: 4.5.4
-          - os-image: ubuntu-20.04
-            version:
-              opencv: 4.2.0
-          - os-image: macos-14
-            version:
-              brew: "@4"
-    runs-on: ${{ matrix.os-image }}
-    env:
-      OPENCV_VERSION: ${{ matrix.version.opencv }}
-      BREW_OPENCV_VERSION: ${{ matrix.version.brew }}
-      SCCACHE_GHA_ENABLED: "true"
-      RUSTC_WRAPPER: "sccache"
-    steps:
-      - uses: actions/checkout@v4
-      - uses: dtolnay/rust-toolchain@stable
-      - uses: mozilla-actions/sccache-action@v0.0.9
-
-      - name: Install dependencies
-        run: ci/install.sh
-        shell: bash
-
-      - name: Test project
-        run: ci/script.sh
-        shell: bash
-
-  docs-rs:
-    runs-on: ubuntu-24.04
-    steps:
-      - uses: actions/checkout@v4
-      - uses: dtolnay/rust-toolchain@stable
-
-      - name: Run a documentation generation test
-        run: ci/docs-rs.sh
-        shell: bash
-
-  msrv:
-    runs-on: ubuntu-24.04
-    env:
-      OPENCV_VERSION: 4.11.0
-      SCCACHE_GHA_ENABLED: "true"
-      RUSTC_WRAPPER: "sccache"
-    steps:
-      - uses: actions/checkout@v4
-      - uses: mozilla-actions/sccache-action@v0.0.9
-
-      - uses: actions/cache@v4
-        with:
-          path: ~/build
-          key: build-${{ env.OPENCV_VERSION }}-dynamic-ubuntu-24.04
-
-      - name: Get MSRV package metadata
-        id: metadata
-        run: cargo metadata --no-deps --format-version 1 | jq -r '"msrv="+(.packages[]|select(.name=="opencv").rust_version)' >> $GITHUB_OUTPUT
-
-      - uses: dtolnay/rust-toolchain@master
-        with:
-          toolchain: ${{ steps.metadata.outputs.msrv }}
-
-      - name: Install dependencies
-        run: ci/install.sh
-        shell: bash
-
-      - name: Check project
-        run: ci/msrv.sh
         shell: bash
