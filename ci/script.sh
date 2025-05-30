@@ -85,17 +85,17 @@ rustc --print=cfg
 
 export RUST_BACKTRACE=full
 
-cargo test -vv -p opencv-binding-generator
+cargo test -p opencv-binding-generator
 
 FEATURES=rgb,f16
 
-cargo test -vv --features "$FEATURES"
-cargo test --release -vv --features "$FEATURES"
-cargo test --release -vv --features "$FEATURES,clang-runtime"
+cargo test --features "$FEATURES"
+cargo test --release --features "$FEATURES"
+cargo test --release --features "$FEATURES,clang-runtime"
 
-cargo run --manifest-path=ci/test-proj/Cargo.toml -vv
+cargo run --manifest-path=ci/test-proj/Cargo.toml
 
 export CXX=clang++
 touch build.rs
-cargo test -vv
-cargo test --release -vv
+cargo test
+cargo test --release
