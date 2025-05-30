@@ -72,7 +72,7 @@ jobs:
         vcpkg-features-cache-key:
           - full
         vcpkg-features:
-          - contrib,imgproc,imgcodecs
+          - contrib,jpeg,tiff,world
     runs-on: ${{ matrix.os-image }}
     env:
       VCPKG_VERSION: ${{ matrix.vcpkg-version }}
