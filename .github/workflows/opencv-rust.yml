@@ -68,7 +68,7 @@ jobs:
           - windows-2025
           - macos-15
         vcpkg-version:
-          - 2025.01.13 # https://github.com/microsoft/vcpkg/releases
+          - 2025.04.09 # https://github.com/microsoft/vcpkg/releases
         vcpkg-features-cache-key:
           - full
         vcpkg-features:
